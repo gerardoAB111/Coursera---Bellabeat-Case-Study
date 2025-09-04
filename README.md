@@ -6,8 +6,8 @@ The analysis explores Fitbit user activity, sleep, and weight data to generate a
 ---
 
 ## 🔗 Live Report
-- **Interactive HTML (GitHub Pages):** [View Report](https://gerardoab111.github.io/Coursera---Bellabeat-Case-Study/)  
-- **Source RMarkdown (.Rmd):** case_study_bellabeat.Rmd
+- **Interactive HTML (GitHub Pages):** (https://gerardoab111.github.io/Coursera---Bellabeat-Case-Study/)  
+- **Source RMarkdown (.Rmd):** `case_study_bellabeat.Rmd`
 ---
 
 ## 🎯 Business Task
