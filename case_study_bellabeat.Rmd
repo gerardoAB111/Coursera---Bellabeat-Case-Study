@@ -1,0 +1,927 @@
+---
+title: "Bellabeat Case Study"
+author: "Gerardo Abarca"
+date: "2025-09-02"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
+
+
+### Bellabeat  
+
+This case study explores how **Bellabeat**, a high-tech company that manufactures health-focused smart products for women, can improve its performance and marketing strategy. By analyzing publicly available smart device usage data (e.g., Fitbit), we aim to understand how consumers interact with non-Bellabeat devices.  
+
+The insights derived from this analysis will be applied to Bellabeat’s product portfolio to identify opportunities for growth, optimize marketing campaigns, and strengthen the company’s position in the global wellness technology market.  
+
+This project follows six key steps that guide the completion of the case study:  
+
+1. **Ask** – Define the business problem and objectives.  
+2. **Prepare** – Collect and organize the necessary data.  
+3. **Process** – Clean and structure the data for analysis.  
+4. **Analyze** – Identify trends, patterns, and insights.  
+5. **Share** – Communicate findings through reports and visualizations.  
+6. **Act** – Apply insights to support business decisions and strategies.  
+
+---
+
+## 💡 Ask  
+
+The goal of this phase is to define the business problem, identify key stakeholders, and clarify the business task.  
+
+#### Guiding Questions  
+
+- **What is the problem you are trying to solve?**  
+  Bellabeat wants to understand how customers use smart devices (e.g., Fitbit) in order to identify usage trends. The aim is to apply these insights to one of Bellabeat’s products and improve its marketing strategy, ultimately supporting the company’s expansion in the global wellness technology market.  
+
+- **How can your insights drive business decisions?**  
+  The insights will highlight customer behavior patterns (e.g., activity levels, sleep tracking, daily steps). These findings can inform targeted marketing campaigns, refine product positioning, and identify growth opportunities by aligning Bellabeat’s offerings with what users value most in wellness technology.  
+
+#### Key Tasks  
+
+1. **Identify the business task**  
+   - Analyze smart device usage data (Fitbit dataset) to identify consumer behavior trends.  
+   - Apply insights to one Bellabeat product (Leaf, Time, Spring, or Bellabeat App) and generate high-level marketing recommendations.  
+
+2. **Consider key stakeholders**  
+   - **Urška Sršen (Cofounder & CCO):** Wants actionable insights that align with Bellabeat’s brand vision.  
+   - **Sando Mur (Cofounder):** Interested in data-driven strategies to support company growth.  
+   - **Marketing Analytics Team:** Will use findings to design and optimize campaigns.  
+   - **Executive Team:** Decision-makers who will evaluate recommendations and guide strategy.  
+
+#### Deliverable  
+
+The business task is to analyze smart device usage data from non-Bellabeat products in order to identify consumer trends. These insights will then be applied to one selected Bellabeat product to guide marketing strategy, improve customer engagement, and support company growth in the wellness technology market.  
+
+To achieve this, the **next step is to prepare the data**, ensuring that it is collected, well-structured, and relevant to our business task.  
+
+---
+
+## 📌 Prepare  
+
+The goal of this phase is to gather the data, assess its quality, and identify which parts of the dataset are relevant for the business task.  
+
+#### Guiding Questions  
+
+- **Where is your dataset stored?**  
+  The dataset is stored on Kaggle and downloaded as a ZIP file containing multiple CSVs.  
+
+- **How is the data organized?**  
+  The dataset is a mix of wide-format files (daily summaries) and long-format files (minute-level logs for steps, sleep, and heart rate).  
+
+- **Does your data ROCCC?**  
+  - **Reliable:** Limited reliability; users logged different durations, and demographic data (e.g., age, gender) is missing. Additionally, not all users logged all activities—some only tracked steps, while others only tracked sleep or heart rate.  
+  - **Original:** Secondary data collected via Amazon Mechanical Turk participants, not a random sample of all Fitbit users.  
+  - **Comprehensive:** Covers activity, sleep, and heart rate, but does not include hydration or stress metrics.  
+  - **Current:** Data was collected in 2016, so it is outdated for present-day behavior analysis.  
+  - **Cited:** Provided by Möbius and available on Kaggle under CC0 license.  
+
+- **What are the problems with the data?**  
+  The dataset is small (30 users), unevenly logged, and dated (2016). It also lacks demographic information. These factors restrict generalizability to the broader Bellabeat customer base.  
+
+- **Licensing, privacy, security**  
+  The dataset is under a **CC0: Public Domain license**, meaning it is free to use without restrictions.  
+
+- **How did you verify the data’s integrity?**  
+  By inspecting the files for consistent structure, correct formatting, and alignment with the Kaggle description.  
+
+#### Key Tasks  
+
+1. **Download the data** → Retrieved from Kaggle and stored locally in organized folders.  
+2. **Unzip and review files** → Inspected CSVs to understand their structure and variables.  
+3. **Filter the data** → Identified datasets relevant to the business task.  
+4. **Determine credibility** → Evaluated the dataset using the ROCCC framework.  
+
+#### Selected Datasets (to be used)  
+
+- *dailyActivity_merged.csv* → Summary of daily steps, distance, calories, and activity minutes.  
+- *sleepDay_merged.csv* → Sleep records including duration and efficiency.  
+- *hourlySteps_merged.csv* → Hourly step counts, indicating movement patterns.  
+- *weightLogInfo_merged.csv* (optional) → Weight and BMI logs.  
+
+**Note**: Hourly calories (hourlyCalories_merged.csv) and hourly intensities (hourlyIntensities_merged.csv) were considered but excluded, because:
+
+- Daily totals from dailyActivity_merged.csv already capture overall energy expenditure.
+- Daily active minutes provide sufficient insight into activity intensity for high-level business recommendations.
+- Including these datasets would add granularity without materially improving insights for the current business task.
+
+#### Datasets Not Selected (excluded from analysis)  
+
+- *heartrate_seconds_merged.csv* → Too granular; second-level data not necessary for current business scope.  
+- *minute datasets (e.g., minuteStepsNarrow.csv, minuteCaloriesWide.csv)* → High granularity, may add noise without significant value.  
+- *Duplicated daily-level files* → Redundant, already captured in dailyActivity_merged.csv.  
+
+#### Deliverable  
+
+A curated collection of relevant Fitbit datasets, organized and documented, ready for processing.  
+
+#### Transition to Process  
+
+With the dataset selected and scoped, the next step is to **prepare it for analysis**. This involves checking data quality, merging overlapping files, removing duplicates, and transforming variables into consistent formats so that the data is clean, reliable, and ready to explore.  
+
+---
+
+## ⚙️ Process  
+
+#### Setup 
+
+```{r}
+# Install packages (run once if needed)
+# install.packages("tidyverse")
+# install.packages("readr")
+# install.packages("lubridate")
+# install.packages("dplyr")
+# install.packages("ggplot2")
+# install.packages("skimr")
+# install.packages("janitor")
+# install.packages("ggrepel")
+
+# Load libraries
+library(tidyverse)
+library(readr)
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+library(skimr)
+library(hms)
+library(janitor)
+library(ggrepel)
+```
+
+#### Import Data and Merge Datasets
+
+```{r}
+### Import Data and Merge Datasets
+
+# Importing CSV files and cleaning column names right away
+daily_activity_march_april <- read_csv("/cloud/project/march_april.16/Fitabase Data 3.12.16-4.11.16/dailyActivity_merged.csv")
+
+daily_activity_april_may <- read_csv("/cloud/project/april_may.16/Fitabase Data 4.12.16-5.12.16/dailyActivity_merged.csv") 
+
+sleep_day <- read_csv("/cloud/project/april_may.16/Fitabase Data 4.12.16-5.12.16/sleepDay_merged.csv") 
+
+weight_log <- read_csv("/cloud/project/march_april.16/Fitabase Data 3.12.16-4.11.16/weightLogInfo_merged.csv") 
+
+weight_log_two <- read_csv("/cloud/project/april_may.16/Fitabase Data 4.12.16-5.12.16/weightLogInfo_merged.csv") 
+
+hourly_steps_march <- read_csv("/cloud/project/march_april.16/Fitabase Data 3.12.16-4.11.16/hourlySteps_merged.csv") 
+
+hourly_steps_april <- read_csv("/cloud/project/april_may.16/Fitabase Data 4.12.16-5.12.16/hourlySteps_merged.csv") 
+
+# Merging datasets
+daily_activity <- bind_rows(daily_activity_march_april, daily_activity_april_may)
+weight_log_info <- bind_rows(weight_log, weight_log_two)
+hourly_steps <- bind_rows(hourly_steps_march, hourly_steps_april)
+
+# Cleaning / Feature engineering
+
+# Change data types
+daily_activity <- daily_activity %>%
+  mutate(ActivityDate = as.Date(ActivityDate, format = "%m/%d/%Y"))
+
+sleep_day <- sleep_day %>%
+  mutate(SleepDay = as.Date(SleepDay, format= "%m/%d/%Y %I:%M:%S %p"))
+
+# Add sleep efficiency
+sleep_day <- sleep_day %>%
+  mutate(SleepEfficiency = (TotalMinutesAsleep / TotalTimeInBed) * 100)
+
+# Add activity level categories
+daily_activity <- daily_activity %>%
+  mutate(
+    ActivityLevel = case_when(
+      TotalSteps < 5000 ~ "Low",
+      TotalSteps >= 5000 & TotalSteps < 10000 ~ "Medium",
+      TotalSteps >= 10000 ~ "High"
+    )
+  )
+
+# Fix weight log dates
+weight_log_info <- weight_log_info %>%
+  mutate(Date = mdy_hms(Date))
+
+# Remove WeightPounds (we’ll keep kg version)
+weight_log_info <- weight_log_info %>%
+  select(-WeightPounds)
+
+weight_cleaned <- weight_log_info %>%
+  mutate(
+    DateTime = as.POSIXct(Date, format = "%m/%d/%Y %I:%M:%S %p"),
+    Date = as.Date(DateTime),
+    Time = format(DateTime, "%H:%M:%S")
+  ) %>%
+  mutate(Time = as_hms(Time))
+
+# Fix datetime in the hourly steps dataset
+
+hourly_steps <- hourly_steps %>%
+  mutate(ActivityHour = mdy_hms(ActivityHour))
+
+# Remove duplicates
+daily_activity_clean <- daily_activity %>%
+  distinct(Id, ActivityDate, .keep_all = TRUE)
+
+sleep_clean <- sleep_day %>%
+  distinct(Id, SleepDay, .keep_all = TRUE)
+
+weight_clean <- weight_cleaned %>%
+  distinct(Id, Date, .keep_all = TRUE)
+
+hourly_steps_clean <- hourly_steps %>%
+  distinct(Id, ActivityHour, .keep_all = TRUE)
+
+# Add Day Type
+daily_activity_clean <- daily_activity_clean %>%
+  mutate(
+    DayType = if_else(weekdays(ActivityDate) %in% c("Saturday", "Sunday"),
+                       "Weekend", "Weekday")
+  )
+
+sleep_clean <- sleep_clean %>%
+  mutate(
+    DayType = ifelse(wday(SleepDay) %in% c(1,7), "Weekend", "Weekday")
+  )
+
+hourly_steps_clean <- hourly_steps_clean %>%
+  mutate(
+    DayType = ifelse(wday(ActivityHour) %in% c(1,7), "Weekend", "Weekday")
+  )
+# Standarizing column names using janitor
+
+daily_activity_clean <-daily_activity_clean %>%
+  janitor::clean_names()
+
+sleep_clean <- sleep_clean %>%
+  janitor::clean_names()
+
+weight_clean <- weight_clean %>%
+  janitor::clean_names()
+
+hourly_steps_clean <- hourly_steps_clean %>%
+  janitor::clean_names()
+
+```
+
+#### Responsibilities and Key Actions  
+- Imported and consolidated datasets from March–April and April–May.  
+- Applied `janitor::clean_names()` across all datasets to ensure consistent, clear, and standardized column names.  
+- Ensured datasets were properly formatted and ready for analysis.  
+
+#### Data Cleaning and Standardization  
+- Converted date and datetime fields (**activity_date, sleep_day, activity_hour, date**) into proper R formats.  
+- Removed duplicate records across datasets to maintain integrity.  
+
+##### New Variables  
+- **weight_kg** retained; **weight_pounds** removed  
+  - Why: Kilograms are consistent and internationally standard.  
+- **sleep_efficiency** = `total_minutes_asleep / total_time_in_bed * 100`  
+  - Why: Provides a standardized measure of sleep quality.  
+- **day_type** classified as *weekday* or *weekend*  
+  - Why: Captures behavioral differences across day types.  
+- **activity_level** categorized as *low*, *medium*, *high* based on daily steps  
+  - Why: Easier to summarize and communicate activity trends.  
+
+#### Dataset Merging  
+- Unified datasets across both periods for:  
+  *daily_activity, sleep_day, weight_log_info, hourly_steps*  
+
+#### Data Validation and Integrity  
+- Counted duplicates per user/date/hour.  
+- Summarized daily and weekly measures to detect inconsistencies.  
+- Built reproducible workflow for future updates.  
+
+#### Achievements and Deliverables  
+- 4 fully cleaned datasets ready for analysis.  
+- Removed duplicates and inconsistencies → ensured higher data quality.  
+- Standardized datetime and categorical variables.  
+- Created **intermediate variables** (*activity_level, sleep_efficiency, day_type*) for deeper insights.  
+
+#### Cleaned Datasets Ready for Analysis  
+- `daily_activity_clean`  
+- `sleep_clean`  
+- `weight_clean`  
+- `hourly_steps_clean`  
+
+## 🔎 Analyze and 📢 Share
+
+### Distribution of Daily Steps across All Users
+
+```{r}
+ggplot(daily_activity_clean, aes(x=total_steps))+
+  geom_histogram(binwidth= 2000, fill="skyblue", color="black")+
+  labs(
+    title="Distribution of Daily Steps",
+    x="Total steps per user",
+    y="Number of days")+
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- Most days users record between 0 and 12,000 steps, peaking around 10,000.
+- Very few days exceed 20,000 steps.
+
+#### Interpretation (User Behavior)
+
+- Users’ activity aligns with the common 10,000-step health goal.
+- However, many days fall under 5,000 steps → sedentary or inactive users.
+
+#### Business Implication (Bellabeat)
+
+- Segmented Marketing and Messaging: Bellabeat should use a dual marketing approach. For the active users, messaging should highlight advanced features and performance optimization. For the less active, the focus should be on motivation, encouragement, and the benefits of small, achievable goals.
+
+- Targeted Product Features: Develop distinct features for each user group. For highly active users, introduce advanced analytics and workout logging. For less active users, implement gamified challenges and a "step-up" program that rewards gradual increases in activity to build lasting habits.
+
+- Strategic Content: Tailor content to user needs. Provide training tips and performance insights for the active segment, while offering simple tips and motivational stories for those who are more sedentary. This builds stronger engagement and brand loyalty across the entire customer base.
+
+### Boxplots by day type for steps
+
+```{r}
+ggplot(daily_activity_clean, aes(x = day_type, y = total_steps, fill = day_type)) +
+  geom_boxplot() +
+  labs(title = "Steps: Weekday vs Weekend", x = "Day Type", y = "Total Steps") +
+  scale_fill_manual(values = c("Weekday" = "lightgreen", "Weekend" = "lightpink")) +
+  theme_minimal()
+```
+
+
+#### Finding (Data Insight)
+
+- The boxplot shows that users generally walk up to 10,000 steps on both weekdays and weekends.
+- Very few days exceed 20,000 steps.
+- The distribution is similar across weekdays and weekends.
+
+#### Interpretation (User Behavior)
+
+- Users’ walking habits remain consistent regardless of the day of the week.
+- No major behavioral difference between weekdays and weekends.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can deliver activity nudges and motivational campaigns uniformly across weekdays and weekends.
+- A unified approach saves resources and ensures consistent engagement.
+
+### Boxplots by day type for calories
+
+```{r}
+ggplot(daily_activity_clean, aes(x = day_type, y = calories, fill = day_type)) +
+  geom_boxplot() +
+  labs(title = "Calories Burned: Weekday vs Weekend", x = "Day Type", y = "Calories") +
+  scale_fill_manual(values = c("Weekday" = "lightgreen", "Weekend" = "lightpink")) +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- Most users burn between 1,500 and 3,000 calories per day.
+- The median is around 2,200–2,300 calories.
+- The distribution is very similar on weekdays and weekends.
+
+#### Interpretation (User Behavior)
+
+- Users show consistent calorie expenditure across the entire week.
+- No significant variation between weekdays and weekends.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can offer unified nutrition and activity plans without needing weekday/weekend differentiation.
+- Simplified recommendations increase user adherence and reduce complexity in product design.
+
+### Steps vs calories scatter + outliers
+
+```{r}
+outliers <- daily_activity_clean %>%
+  filter(total_steps < 2000 | total_steps > 20000)
+
+ggplot(daily_activity_clean, aes(x = total_steps, y = calories)) +
+  geom_point(alpha = 0.5, color = "blue") +
+  geom_point(data = outliers, aes(x = total_steps, y = calories, color = activity_level), size = 3) +
+  labs(title = "Steps vs Calories Burned (Outliers Highlighted)",
+       x = "Total Steps",
+       y = "Calories Burned",
+       color = "Activity Level") +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- The scatterplot shows a direct correlation between total steps and calories burned.
+- Most data points fall between ~2,000 and 15,000 steps, corresponding to ~1,500–3,000 calories burned.
+- Outliers (highlighted in blue and red) confirm the overall trend.
+
+#### Interpretation (User Behavior)
+
+- Higher step counts are generally associated with higher calorie expenditure.
+- Active users (5,000–10,000 steps/day) tend to maintain calorie burn within the healthy range of ~2,000–3,000.
+- While 10,000 steps alone does not guarantee 2,000 calories burned, it strongly contributes to consistent energy expenditure.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can encourage users to aim for 5,000–10,000 steps per day as a sustainable and healthy activity habit.
+- Positioning this as an achievable daily goal can drive user motivation and long-term adherence.
+
+### Average steps over time
+
+```{r}
+daily_activity_clean %>%
+  group_by(activity_date) %>%
+  summarise(avg_steps = mean(total_steps)) %>%
+  ggplot(aes(x = activity_date, y = avg_steps)) +
+  geom_line(color = "blue") +
+  labs(title = "Average Steps Over Time",
+       x = "Date", y = "Average Steps") +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- The line chart shows that average daily steps fluctuate early in the period but stabilize in April and May.
+- From mid-April onward, users consistently reach ~7,000–8,000 steps per day.
+- Early March shows irregular activity with several low-step days.
+
+#### Interpretation (User Behavior)
+
+- Users demonstrate progressive improvement in activity levels over time, suggesting adaptation or motivation to maintain higher step counts.
+- The stabilization near 7,000–8,000 steps indicates a sustainable average for many users.
+- Periodic drops suggest challenges in maintaining consistency (e.g., weekends, personal factors).
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can highlight progress trends in the app to reinforce positive behavior and celebrate milestones.
+- Providing personalized streak challenges (e.g., maintaining 7,000+ steps for a week) can help users stay consistent.
+- By addressing dips with nudges or reminders, Bellabeat can improve user adherence and engagement.
+
+### Correlation Analysis: Steps vs. Calories
+
+```{r}
+cor(daily_activity_clean$total_steps, daily_activity_clean$calories)
+```
+
+#### Finding (Data Insight)
+
+- The correlation between steps and calories burned is moderate and positive (r = 0.59).
+- More steps generally lead to higher calorie expenditure, but the relationship is not perfect.
+- Variation across users suggests other influencing factors (e.g., intensity, duration, individual metabolism).
+
+#### Interpretation (User Behavior)
+
+- Users who walk more tend to burn more calories, but simply increasing step count does not guarantee higher calorie burn.
+- Exercise intensity and activity type also play an important role.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can educate users about the combined impact of step count, intensity, and duration on calorie burn.
+- The app can deliver smarter nudges, encouraging users not only to increase steps but also to include higher-intensity activities.
+- This holistic approach improves user awareness and supports healthier outcomes
+
+### Average Sleep by Day Type
+
+```{r}
+sleep_clean %>%
+  group_by(day_type) %>%
+  summarise(
+    avg_sleep_min = mean(total_minutes_asleep, na.rm = TRUE),
+    median_sleep_min = median(total_minutes_asleep, na.rm = TRUE),
+    avg_efficiency = mean(sleep_efficiency, na.rm = TRUE)
+  )
+```
+
+#### Finding (Data Insight)
+
+- On weekdays, users sleep ~6.9 hours (median 7.1) with 91.9% efficiency.
+- On weekends, users sleep ~7.3–7.7 hours with slightly lower efficiency (91.0%).
+
+#### Interpretation (User Behavior)
+
+- Users tend to sleep less during weekdays and compensate on weekends (sleep debt pattern).
+- Longer sleep on weekends does not improve quality, possibly due to irregular schedules.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can promote consistent sleep routines (“consistency over quantity”).
+- The app could offer sleep debt alerts and classify users at risk of irregular sleep patterns, encouraging healthier habits.
+
+### Histogram of total sleep
+
+```{r}
+ggplot(sleep_clean, aes(x = total_minutes_asleep)) +
+  geom_histogram(binwidth = 30, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Total Sleep Minutes",
+       x = "Minutes Asleep",
+       y = "Number of Nights") +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- The majority of nights fall between 350 and 500 minutes of sleep (≈ 6–8 hours).
+- The peak is around 420–450 minutes (~7 hours).
+There are some outliers: very short sleep (<200 minutes) and very long sleep (>700 minutes).
+
+#### Interpretation (User Behavior)
+
+- Most users meet the general recommendation of ~7 hours of sleep.
+- A notable group sleeps significantly less (<5 hours), indicating sleep deprivation risk.
+- A smaller group oversleeps (>10 hours), which may reflect irregular sleep patterns or health-related issues.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can reinforce healthy sleepers (~7 hours) with motivational feedback.
+- Target users with <5 hours using alerts and educational nudges about sleep health.
+- The app could flag irregular patterns (too little or too much sleep) and suggest actionable routines to improve sleep consistency
+
+### Boxplot sleep by day type
+
+```{r}
+ggplot(sleep_clean, aes(x = day_type, y = total_minutes_asleep, fill = day_type)) +
+  geom_boxplot() +
+  labs(title = "Sleep Duration: Weekday vs Weekend",
+       x = "Day Type", y = "Minutes Asleep") +
+  scale_fill_manual(values = c("Weekday" = "lightgreen", "Weekend" = "lightpink")) +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- On weekends, median sleep duration rises to 7.5–8 hours (450–480 min).
+- On weekdays, median sleep remains lower at around 7 hours (420 min).
+- This indicates a shift in sleep duration depending on the day type.
+
+#### Interpretation (User Behavior)
+
+- Users sleep less during weekdays, likely due to work or study schedules.
+- On weekends, they compensate by sleeping longer, a common “sleep debt” pattern.
+- This suggests that weekday routines negatively impact consistent rest.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can promote regular sleep schedules, emphasizing that weekend compensation does not replace daily quality rest.
+- The app could provide smart reminders on weekdays to encourage earlier bedtimes.
+- Sleep hygiene programs can be targeted at users with large weekday–weekend gaps to reduce long-term sleep debt.
+
+### Outliers
+
+```{r}
+sleep_outliers <- sleep_clean %>%
+  filter(total_minutes_asleep < 300 | total_minutes_asleep > 900)
+
+ggplot() +
+  geom_point(data = sleep_clean,
+             aes(x = total_minutes_asleep, y = sleep_efficiency, color = "Normal"),
+             alpha = 0.5) +
+  geom_point(data = sleep_outliers,
+             aes(x = total_minutes_asleep, y = sleep_efficiency, color = "Outlier"),
+             size = 3) +
+  labs(title = "Sleep Minutes vs Efficiency (Outliers Highlighted)",
+       x = "Minutes Asleep",
+       y = "Sleep Efficiency",
+       color = "Sleep Category") +
+  scale_color_manual(values = c("Normal" = "blue", "Outlier" = "red")) +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- Most users (blue points) cluster around 350–500 minutes of sleep with efficiency >85%.
+- Outliers (red points) show very short sleep (<200 minutes) or unusually low efficiency (<70%).
+- A few cases show long sleep durations (>600 minutes) but not necessarily higher efficiency.
+
+#### Interpretation (User Behavior)
+
+- Normal sleepers maintain both adequate duration and good efficiency, aligning with healthy sleep patterns.
+- Outliers indicate sleep irregularities: some users sleep too little, or their sleep is fragmented/inefficient.
+- Longer sleep does not always equal better quality, suggesting inconsistency in rest routines.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can flag users with abnormal sleep patterns (too short, too long, or low efficiency) and provide tailored recommendations.
+- Promote sleep quality education, emphasizing efficiency and consistency over just duration.
+- Use personalized interventions (alerts, routines, or sleep hygiene programs) to reduce inefficiency and support healthier rest habits.
+
+### Average steps per hour
+
+```{r}
+hourly_steps_clean %>%
+  mutate(hour = hour(activity_hour)) %>%
+  group_by(hour) %>%
+  summarise(avg_steps = mean(step_total)) %>%
+  ggplot(aes(x = hour, y = avg_steps)) +
+  geom_line(color = "blue") +
+  labs(title = "Average Steps by Hour", x = "Hour of Day", y = "Average Steps") +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- The line graph shows the average number of steps taken for each hour of the day.
+- There is very low activity from midnight until around 5 a.m.
+- Activity increases sharply in the morning, peaking around 9 a.m.
+- A second, more pronounced peak occurs in the evening, from approximately 5 p.m. to 8 p.m., before activity drops off again.
+
+#### Interpretation (User Behavior)
+
+- The two distinct peaks correspond to common daily routines, likely a morning commute or workout, and an evening workout or after-work activity.
+- The low activity during the night and the dip in the afternoon (around 1 p.m. to 3 p.m.) suggest periods of rest or sedentary behavior, such as work hours or lunch.
+- The overall pattern shows that users are more active during the evening hours.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can capitalize on the two main activity windows by scheduling targeted in-app notifications and challenges to encourage activity. For example, a reminder at 4 p.m. to "prepare for your evening workout."
+- The company can promote its products as tools for tracking steps during the day and for rewarding progress during the evening peak.
+- Bellabeat could also introduce features that encourage movement during the midday dip to help users combat sedentary habits.
+    
+### Compare weekday vs weekend steps by hour
+
+```{r}
+hourly_steps_clean %>%
+  mutate(hour = hour(activity_hour)) %>%
+  group_by(day_type, hour) %>%
+  summarise(avg_steps = mean(step_total)) %>%
+  ggplot(aes(x = hour, y = avg_steps, color = day_type)) +
+  geom_line(size = 1) +
+  labs(title = "Hourly Steps: Weekday vs Weekend", x = "Hour of Day", y = "Average Steps") +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- The graph shows the average hours of sleep per day of the week, for both weekdays and weekends.
+- The blue line represents the average sleep on weekends, and the red line represents the average sleep on weekdays.
+- On weekdays, the average sleep duration is consistently lower, hovering around 6.5 to 7 hours.
+- On weekends, the average sleep duration is significantly higher, consistently above 7.5 hours.
+- Both lines show a "U" shape, with sleep hours being highest on Monday/Tuesday and Friday/Saturday and lowest in the middle of the week.
+
+#### Interpretation (User Behavior)
+
+- The lower average sleep during weekdays suggests that users may be experiencing "sleep debt," where they get less sleep than needed during the week and try to "catch up" on the weekends.
+- The graph indicates a clear and predictable weekly pattern in user behavior. Users prioritize work/other activities over sleep during the week but dedicate more time to rest on weekends.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat's marketing and app features should address the issue of sleep debt directly. For example, Bellabeat can send a gentle "sleep reminder" notification on weekday evenings to encourage users to go to bed earlier.
+- The app could offer content or features that educate users on the importance of consistent sleep schedules and how sleep debt can affect overall health and well-being.
+- The company could promote its products as tools for monitoring and improving sleep quality, especially during the week when users are most deficient. This could include personalized sleep recommendations based on daily activity and stress levels.
+    
+### Heatmap steps by hour and day type
+
+```{r}
+hourly_steps_clean %>%
+  mutate(hour = hour(activity_hour)) %>%
+  group_by(day_type, hour) %>%
+  summarise(avg_steps = mean(step_total)) %>%
+  ggplot(aes(x = hour, y = day_type, fill = avg_steps)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  labs(title = "Heatmap: Average Hourly Steps by Day Type", x = "Hour", y = "Day Type", fill = "Avg Steps") +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- The heatmap shows that users' step counts peak in the morning and evening on both weekdays and weekends.
+- Weekday morning activity peaks between 7 am and 9 am, while the evening peak is from 5 pm to 7 pm.
+- On weekends, the morning peak starts later, around 9 am, and the evening peak is broader and more intense, lasting from 5 pm to 9 pm.
+
+#### Interpretation (User Behavior)
+
+- The weekday peaks likely correspond to commutes and post-work exercise routines.
+- The later, more intense weekend activity suggests that users have more free time and engage in more extended activities.
+
+#### Business Implication (Bellabeat)
+- Bellabeat can send targeted notifications and challenges during the peak activity hours (e.g., 4 pm on weekdays) to encourage pre-exercise preparation.
+- The app could introduce a "Weekend Challenge" that aligns with the later morning start and longer evening activity periods to maximize user engagement.
+- Bellabeat can also offer "micro-challenges" during the typically inactive daytime hours to help users with sedentary jobs increase their daily steps
+    
+### Average Weight & BMI Profile of User
+```{r}
+weight_clean %>%
+  summarise(
+    avg_weight = mean(weight_kg, na.rm = TRUE),
+    avg_BMI = mean(bmi, na.rm = TRUE),
+    avg_fat = mean(fat, na.rm = TRUE)
+  )
+```
+
+#### Finding (Data Insight)
+
+- The average weight of users is 72.5 kg.
+- The average BMI is 25.4, which falls in the overweight range (≥25).
+- The average body fat percentage is 19.8%, within a generally healthy range but needing context by gender and lifestyle.
+
+#### Interpretation (User Behavior)
+
+- Many users are close to or slightly above the healthy BMI threshold, suggesting that weight management is a concern.
+- The relatively moderate body fat percentage may indicate that not all excess BMI is due to unhealthy fat mass—it could be lifestyle factors (diet, sedentary behavior, lack of activity).
+- Users may not be fully aligning dietary habits with physical activity, leading to BMI creeping into the overweight range.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can develop personalized weight management programs, linking activity tracking with nutrition and lifestyle insights.
+- Introduce BMI and body composition trackers with progress alerts, helping users stay in or return to the healthy range.
+- Provide educational content on the difference between weight, BMI, and fat %, helping users interpret their numbers correctly.
+- Launch gamified challenges (e.g., step goals, hydration, mindful eating streaks) that support maintaining a healthy balance.
+
+### User-level weight trends (Top 5 weight losers and top 5 gainers)
+
+```{r}
+user_weight_trends <- weight_clean %>%
+  group_by(id) %>%
+  summarise(
+    start_weight = first(weight_kg),
+    end_weight = last(weight_kg),
+    weight_change = last(weight_kg) - first(weight_kg),
+    start_BMI = first(bmi),
+    end_BMI = last(bmi),
+    BMI_change = last(bmi) - first(bmi)
+  ) %>%
+  arrange(desc(weight_change))
+
+top_losers <- user_weight_trends %>% filter(weight_change < 0) %>% slice_min(weight_change, n = 5)
+top_gainers <- user_weight_trends %>% filter(weight_change > 0) %>% slice_max(weight_change, n = 5)
+
+top_losers
+top_gainers
+
+```
+
+#### Finding (Data Insight)
+
+- The top weight losers reduced their weight by up to 1.5 kg over the recorded period.
+- The top weight gainers increased their weight by up to 3.9 kg, with smaller gains around 0.4–0.6 kg.
+- BMI changes mirror the weight trends, with maximum BMI decrease of -0.47 and maximum increase of 1.37.
+
+#### Interpretation (User Behavior)
+
+- Some users are successfully losing small amounts of weight, suggesting positive engagement with activity or lifestyle tracking, but the magnitude is limited.
+- Other users are gaining weight, including one substantial gain (3.9 kg), suggesting inconsistent adherence to healthy habits or lifestyle changes that may counteract activity tracking.
+- Overall, users show heterogeneous behavior: a mix of modest progress and weight gain, indicating that motivation and guidance may vary widely.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can target users differently:
+  - For users showing weight gain, provide proactive nudges and personalized recommendations to improve activity and dietary habits.
+  - For users showing small losses, offer reinforcement and gamified challenges to accelerate progress and maintain engagement.
+- Introduce progress tracking dashboards that highlight weight trends, BMI changes, and goals over time, helping users visualize results and stay motivated.
+
+
+### Weight Distributions across All Users
+
+```{r}
+ggplot(weight_clean, aes(x = weight_kg)) +
+  geom_histogram(binwidth = 5, fill="skyblue", color="black") +
+  labs(title="Weight Distribution of Users", x="Weight (kg)", y="Number of Records") +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- The histogram displays the distribution of user weights in kilograms.
+- The distribution is bimodal, meaning it has two distinct peaks.
+- The first, smaller peak is located around 50 kg to 60 kg.
+- The second, larger peak is located around 75 kg to 85 kg.
+- There are no data points below 40 kg or above 90 kg.
+
+#### Interpretation (User Behavior)
+
+- The bimodal distribution suggests the dataset contains two distinct groups or populations of users.
+- It's highly probable that these two groups correspond to two different body types, perhaps related to gender. For example, one peak could represent the typical weight range for women, while the other represents the typical weight range for men. Since Bellabeat's target audience is women, this indicates that the dataset, which is from Fitbit users, includes a significant number of male users.
+- The presence of two separate groups means that a single average weight would be misleading and would not accurately represent either group.
+
+#### Business Implication (Bellabeat)
+
+- This finding is critical for Bellabeat's marketing and product strategy because it highlights a key difference between the sample data and their target audience.
+- Bellabeat's marketing campaigns and product features should be tailored specifically to women, as the current dataset's insights may be skewed by male user data.
+- The company should focus on creating content and product features that resonate with the weight distribution and health goals of their female users, represented by the first peak.
+    
+### BMI Distributions across All Users
+
+```{r}
+ggplot(weight_clean, aes(x = bmi)) +
+  geom_histogram(binwidth = 2, fill="orange", color="black") +
+  labs(title="BMI Distribution of Users", x="BMI", y="Number of Records") +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- The histogram displays the distribution of BMI for the users in the dataset.
+- The most frequent BMI values fall into the range of approximately 22 to 27.
+- The distribution is slightly right-skewed, with a longer tail extending towards higher BMI values.
+- There are no data points in the "underweight" category (BMI below 18.5) and very few in the "obesity" categories (BMI of 30 or greater).
+
+#### Interpretation (User Behavior)
+
+- The majority of users in this sample have a BMI in the "healthy weight" to "overweight" range. This indicates that the dataset's users are generally not underweight and are either at a healthy weight or are carrying excess weight.
+- The right-skewed distribution suggests that while many users are at a healthy weight, a significant portion is overweight, and a small number of users are in the obese category.
+- This is a key insight because it shows that a large segment of the potential customer base is likely interested in weight management and health improvement, a core focus of Bellabeat's products.
+
+#### Business Implication (Bellabeat)
+
+- Bellabeat can target its marketing campaigns to the overweight segment of the population. Messaging could focus on personalized weight management goals, encouraging users to move from the "overweight" category to the "healthy weight" category.
+- The company could develop new features or content within the Bellabeat app specifically tailored to users with higher BMIs, such as customized workout plans, nutritional guidance, and mindful eating resources.
+    
+### Average Weight and BMI Over Time
+
+```{r}
+weight_clean %>%
+  group_by(date) %>%
+  summarise(
+    avg_weight = mean(weight_kg, na.rm = TRUE),
+    avg_bmi = mean(bmi, na.rm = TRUE)
+  ) %>%
+  tidyr::pivot_longer(
+    cols = c(avg_weight, avg_bmi),
+    names_to = "Metric",
+    values_to = "Value"
+  ) %>%
+  ggplot(aes(x = date, y = Value, color = Metric)) +
+  geom_line(size = 1) +
+  labs(
+    title = "Average Weight and BMI Over Time",
+    x = "Date",
+    y = "Value",
+    color = "Metric"
+  ) +
+  scale_color_manual(
+    values = c("avg_weight" = "blue", "avg_bmi" = "red"),
+    labels = c("avg_weight" = "Average Weight (kg)", "avg_bmi" = "Average BMI")
+  ) +
+  theme_minimal()
+```
+
+#### Finding (Data Insight)
+
+- The graph displays two metrics: Average Weight (in kg) and Average BMI.
+- The Average BMI line (red) remains relatively stable, hovering around a value of 25.
+- The Average Weight line (blue) shows significant fluctuation over the period, with values swinging between approximately 60 kg and 85 kg.
+
+#### Interpretation (User Behavior)
+
+- The average BMI values fall near the healthy-overweight threshold of 25, which aligns with a previous finding that the average BMI of the users is 25.4.
+- The wide fluctuations in the average weight suggest that weight logging among this small group of users is inconsistent. It's likely that a few users with very high or low weights are logging their data sporadically, causing the average to swing dramatically.
+- While the average BMI remains relatively stable, the volatility of the weight data could be discouraging for a user trying to track their progress.
+
+#### Business Implication (Bellabeat)
+- Bellabeat can implement features that encourage consistent, daily weight logging to provide users with a more stable and accurate long-term trend.
+- The app could offer educational content that explains the difference between short-term weight fluctuations and long-term trends, helping users understand their data better.
+- Given that the average BMI is in the overweight range, Bellabeat can develop targeted in-app programs or challenges focused on healthy weight management, combining activity goals with nutritional tips.
+
+## 🎯 Act
+
+The insights gathered from the data reveal that users have a moderate but inconsistent engagement with health tracking, often falling into a "sleep debt" pattern on weekends and having an average BMI in the overweight range. The Bellabeat App can serve as the primary tool to address these user behaviors through targeted features and a refined marketing strategy.
+
+#### 1. Product Development & Features
+
+- **Implement a Sleep Debt Tracker and Alert System**: The app should track the difference between weekday and weekend sleep. When a significant gap is detected, the app can send a personalized alert to the user, reminding them to maintain a more consistent sleep schedule.
+
+- **Integrate Gamified "Streak Challenges"**: To combat the periodic dips in activity, introduce a "Consistency Challenge" that encourages users to maintain a minimum of 7,000 steps for seven consecutive days. Offer badges or small rewards for reaching milestones.
+
+- **Enhance Health Dashboards**: Create a dashboard that visualizes a user's progress on key metrics like BMI and weight over time. This can help users who are gaining or losing weight to visualize their trends and stay motivated.
+
+- **Develop a Holistic Health Score**: The app can use data points such as steps, sleep efficiency, and activity intensity to generate a single "Daily Health Score". This simplified metric would help users understand their overall wellness and encourage them to improve low-scoring areas.
+
+#### 2. Marketing & Communication
+
+- **Launch a "Find Your Healthy" Campaign**: The average user has a BMI in the overweight range, but a relatively healthy body fat percentage. Bellabeat's marketing can focus on this, emphasizing that true health is more than just a number on the scale.
+
+- **Create Targeted Nudges**: Instead of one-size-fits-all messages, the app should provide targeted alerts. For example, a reminder to "get moving" at 4 p.m. to encourage evening activity, which is a peak time for users.
+
+- **Emphasize Education**: Provide educational content within the app that explains the combined impact of steps, intensity, and duration on calorie burn. This will help users understand how to get the most out of their activity and support healthier outcomes.
+
+#### 3. Strategy & Positioning
+
+- **Position Bellabeat as a Proactive Partner**: Position Bellabeat not just as a data logger, but as a personal wellness coach. The app’s features for sleep debt alerts and tailored nudges demonstrate a proactive approach to a user’s well-being.
+
+- **Align with Long-Term Habits**: Focus on promoting sustainable, long-term habits rather than short-term gains. By encouraging a consistent 5,000–10,000 steps per day, Bellabeat can help users maintain a healthy routine
+
+## 📝 Main Insights Summary
+
+Here is a summary of the main insights derived from the analysis of the Fitbit data, covering key findings from all analyzed datasets:
+
+- **Daily Activity**: There is a strong, positive correlation between the number of steps taken and the calories burned. Users' activity levels are generally consistent throughout the week, with slight peaks on Tuesdays and Saturdays and the lowest activity on Sundays. The average daily step count is below the recommended 10,000 steps.
+
+- **Hourly Activity**: User activity shows two distinct peaks during the day: a morning peak and a more significant evening peak (5 p.m. to 8 p.m.). This pattern suggests that users are most active before and after a standard workday.
+
+- **Sleep Patterns**: Users tend to accumulate a "sleep debt" during the weekdays, which they try to make up for on weekends by sleeping longer. This inconsistency in sleep habits presents an opportunity for Bellabeat to offer features that promote better sleep routines.
+
+- **Weight and BMI**: The average BMI of the user population falls into the overweight category. However, since the data also suggests a healthy body fat percentage for many users, Bellabeat can emphasize that overall wellness is more important than just a number on the scale.
+
+- **Device Usage**: The dataset has a limited number of users, and the data is from a small subset of the population, which may not be representative of Bellabeat's target audience of women.
+
+## ⚠️ Data Limitations:
+
+- **Limited Timeframe**: The dataset is too limited in duration, as it only covers a period of 60 days, and many of the individual files only have 30 days of data. This short timeframe makes it difficult to identify long-term trends or seasonal patterns.
+
+- **Insufficient Demographic Data**: The dataset lacks crucial demographic information such as gender, age, and location. This is a significant limitation, especially since Bellabeat's target audience is women. Without this data, the insights cannot be definitively applied to Bellabeat's specific user base.
+
+- **Small Sample Size**: The dataset is derived from a small sample of only 30 users, making the findings difficult to generalize to the broader population of fitness tracker users.
+
+- **Non-representative population**: Fitbit participants are not Bellabeat users
+
+- **Incomplete Logs**: Not all users recorded sleep and weight consistently
+
+- **Outdated**: Data collected in 2016, which is outdated to current behaviors
+   
