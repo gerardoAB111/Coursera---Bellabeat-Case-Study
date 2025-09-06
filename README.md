@@ -72,10 +72,39 @@ This project follows the six key phases of the Google DA capstone:
 
 ---
 
-## 🔑 Key Insights
-- Users with more consistent **sleep** show higher **next-day activity**.  
-- **Weekday activity** peaks midweek; weekends dip in steps.  
-- A minority of users log **weight/sleep consistently**, biasing results.  
+## 📊 Results
+
+### Daily Steps
+
+- **Distribution:** Most users take 0–12,000 steps/day, peaking around 10,000. Few exceed 20,000 steps.  
+- **Weekday vs Weekend:** Activity levels are similar; no major difference.  
+- **Trend over time:** Steps gradually stabilize around 7,000–8,000/day.  
+- **Business Insight:** Segment messaging for active vs. less active users. Encourage sustainable step goals and reward consistency.
+
+### Calories Burned
+
+- Median calories burned: ~2,200–2,300/day.  
+- Weekday and weekend patterns are similar.  
+- **Insight:** Step count correlates moderately with calories (r ≈ 0.59). Educate users on combining steps with intensity for better results.
+
+### Sleep
+
+- Average sleep: 6.9 h (weekdays) vs 7.3–7.7 h (weekends); efficiency ~91%.  
+- Outliers show very short (<5 h) or long sleep (>10 h).  
+- **Insight:** Promote consistent sleep routines, alert users to irregular patterns, and emphasize sleep quality over quantity.
+
+### Hourly Activity
+
+- Two peaks in steps: morning (7–9 a.m.) and evening (5–8 p.m.). Low activity during night and early afternoon.  
+- Weekend peaks occur later and last longer.  
+- **Insight:** Schedule in-app challenges and notifications during peak hours; encourage movement during low-activity periods.
+
+### Weight & BMI
+
+- Avg weight: 72.5 kg; avg BMI: 25.4 (overweight); avg body fat: 19.8%.  
+- Distribution is bimodal, likely reflecting mixed-gender Fitbit users.  
+- Weight trends: modest losses up to -1.5 kg; gains up to +3.9 kg.  
+- **Insight:** Focus on personalized weight management, gamified challenges, and female-targeted campaigns.
 
 ---
 
